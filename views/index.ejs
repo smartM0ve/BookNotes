@@ -1,0 +1,239 @@
+
+<%- include('partials/header.ejs') %>
+
+    <div class="container">
+
+        <div class="header">
+            <div class="page-title">My book notes</div>
+            <div class="searchContainer">
+                <form action="/search" id="searchForm" class="searchForm" method="post">
+                    <i class="fa fa-search search-icon"></i>
+                    <% if (locals.searchValue) { %>
+                        <input type="text" name="searchValue" id="inputSearch" placeholder="Search a book" autocomplete="off" value="<%= searchValue %>">
+                    <% } else { %>
+                        <input type="text" name="searchValue" id="inputSearch" placeholder="Search a book" autocomplete="off" value="">
+                    <% } %>
+                </form>
+                
+                <!-- <% if (locals.covers) { %>
+                    <ul id="search-items">
+                        <% for(let cover of covers){ %>
+                            <li onclick="searchSelect('<%= cover.cover_i %>')">
+                                <% if (cover.cover_i !== undefined) { %>
+                                    <img src=<%="https://covers.openlibrary.org/b/id/"+cover.cover_i+"-S.jpg"%> alt="book cover"> 
+                                <% } else { %>
+                                    <div style="width: 40px; height: 60px; background-color: darkgray; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: x-large;">?</div>
+                                <% } %>
+                                <div class="search-item-title">
+                                    <div style="font-weight: 600;"><%=cover.title%></div>
+                                    <% if (cover.author_name) { %>
+                                        <div style="font-size: small;">by <%= cover.author_name[0] %></div>
+                                    <% } else { %>
+                                        <div style="font-size: small;">by</div>
+                                    <% } %>
+                                </div>
+                            </li>
+                        <% } %>
+                    </ul>
+                <% } %> -->
+                <ul id="search-items" class="search-items"></ul>
+            </div>
+        </div>
+
+        <div class="intro">
+            <p>
+                This is a list of books I've read and would like to share my thoughts.
+                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+            </p>
+        </div>
+
+        <div class="menu">
+            <form action="/" method="post">
+                <div class="menuSort">
+                    <button type="submit" name="sortType" value="rating">
+                        <% if (locals.sortType == "rating") { %>
+                            <div id="sort-rating" class="sort btn sort-selected"><i class="fa fa-sort-<%= locals.sortDirection %> btn-icon"></i> rating</div>
+                        <% } else { %>
+                            <div id="sort-rating" class="sort btn"><i class="fa fa-sort btn-icon"></i> rating</div>
+                        <% } %>
+                    </button>
+                    <button type="submit" name="sortType" value="date_read">
+                        <% if (locals.sortType == "date_read") { %>
+                            <div id="sort-newest" class="sort btn sort-selected"><i class="fa fa-sort-<%= locals.sortDirection %> btn-icon"></i> newest</div>
+                        <% } else { %>
+                            <div id="sort-newest" class="sort btn"><i class="fa fa-sort btn-icon"></i> newest</div>
+                        <% } %>
+                    </button>
+                    <button type="submit" name="sortType" value="title">
+                        <% if (locals.sortType == "title") { %>
+                            <div id="sort-newest" class="sort btn sort-selected"><i class="fa fa-sort-<%= locals.sortDirection %> btn-icon"></i> title</div>
+                        <% } else { %>
+                            <div id="sort-title" class="sort btn"><i class="fa fa-sort btn-icon"></i> title</div>
+                        <% } %>
+                    </button>
+                </div>
+            </form>
+                <!-- <div id="sort-rating" class="sort btn"><i class="fa fa-sort btn-icon"></i> rating</div>
+                <div id="sort-newest" class="sort btn"><i class="fa fa-sort btn-icon"></i> newest</div>
+                <div id="sort-title" class="sort btn"><i class="fa fa-sort btn-icon"></i> title</div> -->
+            <form action="/add" method="post">
+                <div id="btn-new" class="btn btn-new"><i class="fa fa-plus btn-icon"></i> new book</div>
+            </form>
+        </div>
+
+
+        
+
+
+        <div id="cards-list">
+
+            <div id="card-new" class="card">
+                <div>
+                    <div id="cover-new" class="cover cover-empty">?</div>
+                    <div id="cover_id-new" class="cover-id" contenteditable></div>
+                </div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <div style="display: flex; flex-direction: column; width: 100%;">
+    
+                            <div class="searchContainer">
+                                <div id="title-new" class="title" contenteditable>Book name...</div>
+                                <ul id="search-items-new" class="search-items"></ul>
+                            </div>
+    
+                            <div><span style="color: gray; font-size: small;">By: </span><span id="author-new" class="author" contenteditable>Author...</span></div>
+                        </div>
+                            <div class="card-buttons">
+                                <button type="button" title="Save" id="save-new" onclick="handlerSave('-new')">
+                                    <i class="fa fa-save edit btn"></i>
+                                </button>
+                            </div>
+                    </div>
+                    <div class="card-header">
+                        <div class="date"><span style="color: gray;">Read: </span><span id="date-new" contenteditable><%= new Intl.DateTimeFormat('pt-BR').format(new Date()); %></span> </div>
+                        <div id="ratingValue-new" hidden>0</div>
+                        <div>
+                            <span style="color: gray;">Rating:</span>
+                            <span id="ratingStars-new">
+                                <% for(let i = 1; i <= 5; i++){ %>
+                                    <% if (0 < i) { %>
+                                        <i class="fa fa-star star star-editable" onclick="handlerStars('-new',<%= i %>)"></i>
+                                    <% } else { %>
+                                        <i class="fa fa-star star star-selected star-editable" onclick="handlerStars('-new',<%= i %>)"></i>
+                                    <% } %>
+                                <% } %>
+                            </span>
+                        </div>
+                    </div>
+                    <div id="note-new" class="note" contenteditable>Review here...</div>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+            <% if (locals.listItems) { %>
+                <% for(let item of listItems){ %>
+    
+                    <div id="card<%= item.id %>" class="card">
+                        <div>
+                            <% if (item.cover_id !== "") { %>
+                                <img id="cover<%= item.id %>" src="https://covers.openlibrary.org/b/id/<%= item.cover_id %>-L.jpg" alt="book cover" class="cover">
+                            <% } else { %>
+                                <div id="cover<%= item.id %>" class="cover cover-empty">?</div>
+                            <% } %>
+                            <div id="cover_id<%= item.id %>" class="cover-id" hidden><%= item.cover_id %></div>
+                        </div>
+                        <!-- <form action="/edit" method="post" style="width: 100%;"> -->
+                            <div class="card-content">
+                                <div class="card-header">
+                                    <div style="display: flex; flex-direction: column; width: 100%;">
+
+                                        <div class="searchContainer">
+                                            <div id="title<%= item.id %>" class="title"><%= item.title %></div>
+                                            <ul id="search-items<%= item.id %>" class="search-items"></ul>
+                                        </div>
+
+                                        <!-- <input id="input<%=item.id%>" class="title" type="text" name="updatedItemTitle" value="<%= item.title %>" autocomplete="off" readonly/> -->
+                                        <div><span style="color: gray; font-size: small;">By: </span><span id="author<%= item.id %>" class="author"><%= item.author %></span></div>
+                                    </div>
+                                     <div class="card-buttons">
+                                         <button type="button" title="Edit" id="edit<%= item.id %>" onclick="handlerEdit('<%= item.id %>')" >
+                                             <i class="fa fa-pencil edit btn"></i>
+                                         </button>
+                                         <button type="button" title="Save" id="save<%= item.id %>" onclick="handlerSave('<%= item.id %>')" hidden>
+                                            <i class="fa fa-save edit btn"></i>
+                                        </button>
+                                        <button type="button" title="Delete" id="delete<%= item.id %>" onclick="handlerDelete('<%= item.id %>')" hidden>
+                                            <i class="fa fa-trash edit btn"></i>
+                                        </button>
+                                        <button type="button" title="Cancel" id="cancel<%= item.id %>" onclick="handlerCancel('<%= item.id %>')" hidden>
+                                            <i class="fa fa-undo edit btn"></i>
+                                        </button>
+                                     </div>
+                                </div>
+                                <div class="card-header">
+                                    <div class="date"><span style="color: gray;">Read: </span><span id="date<%= item.id %>"><%= new Intl.DateTimeFormat('pt-BR').format(item.date_read); %></span> </div>
+                                    <div id="ratingValue<%= item.id %>" hidden><%= item.rating %></div>
+                                    <div>
+                                        <span style="color: gray;">Rating:</span>
+                                        <span id="ratingStars<%= item.id %>">
+                                            <% for(let i = 1; i <= 5; i++){ %>
+                                                <% if (item.rating < i) { %>
+                                                    <i class="fa fa-star star"></i>
+                                                <% } else { %>
+                                                    <i class="fa fa-star star star-selected"></i>
+                                                <% } %>
+                                            <% } %>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div id="note<%=item.id%>" class="note">
+                                    <%= item.note %>                        
+                                </div>
+                            </div>
+                        <!-- </form> -->
+                    </div>
+                            
+                <% } %>
+            <% } %>
+        </div>
+
+        
+        <!-- <div class="card">
+            <img src="https://covers.openlibrary.org/b/id/14512053-L.jpg" alt="book cover" class="cover">
+            <div class="card-content">
+                <div style="display: flex; justify-content: space-between;">
+                    <div class="title">Harry Potter e a Pedra Filosofal</div>
+                    <i class="fa fa-pencil edit btn"></i>
+                </div>
+                <div class="subtitle">
+                    <div class="date">Read date: ##/##/####</div>
+                    <div class="rating">Rating: 7/10</div>
+                </div>
+                <div class="note">
+                    This is a note of a book that I have read. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </div>
+                <form action="/edit" method="post">
+
+                </form>
+            </div>
+        </div> -->
+        
+    </div>
+
+    <!-- Message -->
+    <div id="message" class="message">
+    </div>
+
+    <script src="scripts.js"></script>
+
+<%- include('partials/footer.ejs') %>
