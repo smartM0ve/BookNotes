@@ -13,3 +13,5 @@ It is a register of the name, the author, the notes about the book, the date you
 
 It utilizes the Open Library Covers API to fetch book covers.
 - https://openlibrary.org/dev/docs/api/covers
+
+![Peek 2025-02-04 03-48](https://github.com/user-attachments/assets/96bd36db-8a5f-4cde-be8d-1430b1cc87e7)
