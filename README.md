@@ -1,3 +1,5 @@
+![image](https://github.com/user-attachments/assets/ea1cdcd8-59f6-468b-9550-4ddff41ede57)
+
 # BookNotes test example
 
 This project is an exercise of a web development course. The goal here is to store the notes from books you've read.
